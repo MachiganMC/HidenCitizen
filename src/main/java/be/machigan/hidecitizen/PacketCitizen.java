@@ -1,17 +1,13 @@
 package be.machigan.hidecitizen;
 
-import static com.comphenix.protocol.PacketType.Play.Server.*;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import net.citizensnpcs.api.npc.NPC;
-import org.bukkit.entity.Entity;
 
-import java.util.*;
+import java.util.UUID;
 
-import static com.comphenix.protocol.PacketType.Play.Server.ENTITY_EQUIPMENT;
+import static com.comphenix.protocol.PacketType.Play.Server.*;
 
 public class PacketCitizen extends PacketAdapter {
     private static final PacketType[] PACKET_TYPES = {

@@ -13,9 +13,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class HideCitizenCommand implements CommandExecutor {
+    private static final Map<String, BiConsumer<Player, Entity>> ACTIONS = Map.of(
+            "show", HideCitizenCommand::showNPCFromPlayer,
+            "hide", HideCitizenCommand::hideNPCPlayer,
+            "toggle", HideCitizenCommand::toggleNPCVisibilityFromPlayer
+    );
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, String[] args) {
         if (!sender.hasPermission(HideCitizen.USE_PERMISSION)) {
@@ -39,14 +48,18 @@ public class HideCitizenCommand implements CommandExecutor {
             sender.sendMessage("Player don't exist");
             return true;
         }
-        HideCitizen.addCitizenTranslationIfNotExists(npc);
-        switch (args[1].toLowerCase()) {
-            case "show" -> showNPCFromPlayer(player, npc.getEntity());
-            case "hide" -> hideNPCPlayer(player, npc.getEntity());
-            case "toggle" -> toggleNPCVisibilityFromPlayer(player, npc.getEntity());
-            default -> sender.sendMessage("Unknown action use show, hide or toggle");
+        BiConsumer<Player, Entity> action = ACTIONS.get(args[1].toLowerCase());
+        if (action == null) {
+            sender.sendMessage("The npc is despawned, your action will be consumed when the entity will respawn");
+            return true;
         }
-
+        if (npc.getEntity() == null) {
+            sender.sendMessage("The npc is despawned, your action will be consumed when the npc will respawn");
+            OnNPCSpawnEvent.addActionOnNPCRespawn(npc, newEntity ->  action.accept(player, newEntity));
+            return true;
+        }
+        HideCitizen.addCitizenTranslationIfNotExists(npc);
+        action.accept(player, npc.getEntity());
         return true;
     }
 

@@ -5,15 +5,11 @@ import com.comphenix.protocol.ProtocolManager;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Husk;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HideCitizen extends JavaPlugin {
@@ -28,6 +24,7 @@ public class HideCitizen extends JavaPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
         protocolManager.removePacketListeners(this);
         protocolManager.addPacketListener(new PacketCitizen());
+        Bukkit.getPluginManager().registerEvents(new OnNPCSpawnEvent(), this);
         this.setCommand();
         this.startFillFromNPCRegistryScheduler();
     }
@@ -48,7 +45,12 @@ public class HideCitizen extends JavaPlugin {
         final int[] taskID = new int[] { -1 };
         taskID[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
             passedTimes.addAndGet(20);
-            CitizensAPI.getNPCRegistry().forEach(npc -> ENTITY_ID_UUID_TRANSLATION.put(npc.getEntity().getEntityId(), npc.getEntity().getUniqueId()));
+            CitizensAPI.getNPCRegistry()
+                    .forEach(npc -> {
+                        Entity npcEntity = npc.getEntity();
+                        if (npcEntity != null)
+                            ENTITY_ID_UUID_TRANSLATION.put(npcEntity.getEntityId(), npc.getEntity().getUniqueId());
+                    });
             if (!ENTITY_ID_UUID_TRANSLATION.isEmpty() || passedTimes.get() > 1200)
                 Bukkit.getScheduler().cancelTask(taskID[0]);
         },  20L, 20L);
@@ -60,8 +62,7 @@ public class HideCitizen extends JavaPlugin {
 
     public static void addCitizenTranslationIfNotExists(NPC npc) {
         Entity entity = npc.getEntity();
-        if (!ENTITY_ID_UUID_TRANSLATION.containsKey(entity.getEntityId()))
-            ENTITY_ID_UUID_TRANSLATION.put(entity.getEntityId(), entity.getUniqueId());
+        ENTITY_ID_UUID_TRANSLATION.putIfAbsent(entity.getEntityId(), entity.getUniqueId());
     }
 
     public static ProtocolManager getProtocolManager() {

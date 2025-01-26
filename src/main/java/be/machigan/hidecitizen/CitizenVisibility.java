@@ -1,10 +1,11 @@
 package be.machigan.hidecitizen;
 
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class CitizenVisibility {
     private final Map<UUID, Boolean> hiddenCitizensState = new HashMap<>();

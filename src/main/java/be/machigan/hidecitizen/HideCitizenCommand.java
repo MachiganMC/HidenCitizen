@@ -65,7 +65,7 @@ public class HideCitizenCommand implements CommandExecutor {
 
     private static void showNPCFromPlayer(Player player, Entity citizenEntity) {
         CitizenVisibility.showCitizenFor(player, citizenEntity);
-        executeCommand("lp user " + player.getName() + " permission set " + CitizenVisibility.getPermissionVisibility(citizenEntity.getUniqueId()) + " false");
+        executeCommand("lp user " + player.getName() + " permission set " + CitizenVisibility.getPermissionVisibility(citizenEntity.getUniqueId()) + " true");
         HideCitizen.getProtocolManager().updateEntity(citizenEntity, List.of(player));
     }
 
@@ -74,7 +74,7 @@ public class HideCitizenCommand implements CommandExecutor {
         PacketContainer destroyEntity = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
         destroyEntity.getModifier().write(0, new IntArrayList(new int[] {citizenEntity.getEntityId()}));
         HideCitizen.getProtocolManager().sendServerPacket(player, destroyEntity);
-        executeCommand("lp user " + player.getName() + " permission set " + CitizenVisibility.getPermissionVisibility(citizenEntity.getUniqueId()) + " true");
+        executeCommand("lp user " + player.getName() + " permission set " + CitizenVisibility.getPermissionVisibility(citizenEntity.getUniqueId()) + " false");
     }
 
     private static void toggleNPCVisibilityFromPlayer(Player player, Entity entity) {

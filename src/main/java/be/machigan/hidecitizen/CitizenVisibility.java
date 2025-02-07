@@ -1,5 +1,7 @@
 package be.machigan.hidecitizen;
 
+import it.unimi.dsi.fastutil.objects.Object2BooleanArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -8,7 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CitizenVisibility {
-    private final Map<UUID, Boolean> hiddenCitizensState = new HashMap<>();
+    private final Object2BooleanMap<UUID> hiddenCitizensState = new Object2BooleanArrayMap<>();
     private final static Map<UUID, CitizenVisibility> PLAYERS_CACHE = new HashMap<>();
 
     public static void showCitizenFor(Player player, Entity citizenEntity) {
@@ -29,14 +31,21 @@ public class CitizenVisibility {
         CitizenVisibility citizenVisibility = PLAYERS_CACHE.get(player.getUniqueId());
         if (citizenVisibility == null) {
             citizenVisibility = getNewVisibilityFor(player, citizenUUID);
+            PLAYERS_CACHE.put(player.getUniqueId(), citizenVisibility);
         }
-        return Boolean.TRUE.equals(citizenVisibility.hiddenCitizensState.putIfAbsent(citizenUUID, player.hasPermission(getPermissionVisibility(citizenUUID))));
+        return citizenVisibility.hiddenCitizensState.getBoolean(citizenUUID);
     }
 
     private static CitizenVisibility getNewVisibilityFor(Player player, UUID citizenUUID) {
         CitizenVisibility citizenVisibility = new CitizenVisibility();
-        citizenVisibility.hiddenCitizensState.put(citizenUUID, player.hasPermission(getPermissionVisibility(citizenUUID)));
+        citizenVisibility.hiddenCitizensState.put(citizenUUID, hideViaPermission(player, citizenUUID));
         return citizenVisibility;
+    }
+
+    private static boolean hideViaPermission(Player player, UUID citizenUUID) {
+        String permission = getPermissionVisibility(citizenUUID);
+        if (!player.isPermissionSet(permission)) return false;
+        return !player.hasPermission(permission);
     }
 
     private static CitizenVisibility getCitizenVisibilityOf(Player player) {
@@ -45,6 +54,6 @@ public class CitizenVisibility {
     }
 
     public static String getPermissionVisibility(UUID entityID) {
-        return "hidecitizen.hidden." + entityID;
+        return "hidecitizen.show." + entityID;
     }
 }

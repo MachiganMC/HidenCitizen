@@ -17,6 +17,3 @@ permissions:
   hidecitizen.hide:
     default: op
     description: Allows player to hide citizen for other players
-  hidecitizen.hidden.*:
-    default: false
-    description: Defines if a citizen is hidden or not

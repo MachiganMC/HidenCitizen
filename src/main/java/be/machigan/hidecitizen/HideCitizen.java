@@ -4,9 +4,12 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.luckperms.api.LuckPerms;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
@@ -17,6 +20,7 @@ public class HideCitizen extends JavaPlugin {
     public static final Map<Integer, UUID> ENTITY_ID_UUID_TRANSLATION = new HashMap<>();
     private static ProtocolManager protocolManager;
     public static final String USE_PERMISSION = "hidecitizen.hide";
+    private static LuckPerms luckPerms;
 
     @Override
     public void onEnable() {
@@ -27,6 +31,10 @@ public class HideCitizen extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new OnNPCSpawnEvent(), this);
         this.setCommand();
         this.startFillFromNPCRegistryScheduler();
+        luckPerms = Optional
+                .ofNullable(getServer().getServicesManager().getRegistration(LuckPerms.class))
+                .orElseThrow(() -> new IllegalStateException("LuckPerm"))
+                .getProvider();
     }
 
     private void setCommand() {
@@ -67,5 +75,9 @@ public class HideCitizen extends JavaPlugin {
 
     public static ProtocolManager getProtocolManager() {
         return protocolManager;
+    }
+
+    public static LuckPerms getLuckPerms() {
+        return luckPerms;
     }
 }

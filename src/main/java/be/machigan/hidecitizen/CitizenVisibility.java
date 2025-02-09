@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,11 +21,19 @@ public class CitizenVisibility {
         PLAYERS_CACHE.put(player.getUniqueId(), citizenVisibility);
     }
 
+    public static void showCitizenFor(List<Player> players, Entity citizenEntity) {
+        players.forEach(p -> showCitizenFor(p, citizenEntity));
+    }
+
     public static void hideCitizenFor(Player player, Entity citizenEntity) {
         CitizenVisibility citizenVisibility = getCitizenVisibilityOf(player);
         UUID citizenUUID = citizenEntity.getUniqueId();
         citizenVisibility.hiddenCitizensState.put(citizenUUID, true);
         PLAYERS_CACHE.put(player.getUniqueId(), citizenVisibility);
+    }
+
+    public static void hideCitizenFor(List<Player> players, Entity citizenEntity) {
+        players.forEach(p -> hideCitizenFor(p, citizenEntity));
     }
 
     public static boolean isCitizenVisibleFor(Player player, UUID citizenUUID) {
@@ -55,5 +64,9 @@ public class CitizenVisibility {
 
     public static String getPermissionVisibility(UUID entityID) {
         return "hidecitizen.show." + entityID;
+    }
+
+    public static String getPermissionVisibility(Entity entity) {
+        return getPermissionVisibility(entity.getUniqueId());
     }
 }

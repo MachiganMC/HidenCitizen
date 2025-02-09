@@ -22,6 +22,8 @@ public class HideCitizenTabCompleter implements TabCompleter {
             return StringUtil.copyPartialMatches(args[1], ACTIONS, new ArrayList<>());
         if (args.length == 3)
             return null;
+        if (args.length == 4)
+            return StringUtil.copyPartialMatches(args[3], List.of("--group"), new ArrayList<>());
         return List.of();
     }
 }
